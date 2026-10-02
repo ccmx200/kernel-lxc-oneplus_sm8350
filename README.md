@@ -152,3 +152,36 @@ git push -u origin main
 
 内核源码遵循其原始 GPL-2.0 许可证。
 ReSukiSU 源码遵循其仓库内对应许可证。
+
+---
+
+## 卡一屏问题修复记录
+
+首次编译时额外开启了：
+
+```text
+CONFIG_FAIR_GROUP_SCHED=y
+```
+
+该选项在 GKI 内核中会改变嵌入 `task_struct` 的 `struct sched_entity`
+布局，破坏 kABI，导致 vendor 模块初始化异常，表现为卡第一屏/开机循环。
+
+现已恢复为 QGKI 原生配置：
+
+```text
+# CONFIG_FAIR_GROUP_SCHED is not set
+```
+
+Droidspaces GKI kABI 补丁仍然保持应用：
+
+```text
+001.GKI-below-6.12-fix_sysvipc_kabi_6_7_8.patch
+002.5.10_or_lower_use_android_abi_padding_for_posix_mqueue.patch
+```
+
+如果仍卡一屏，下一步需要尝试 Droidspaces 提供的备选 SYSVIPC kABI reserve 变体：
+
+```text
+001.GKI-below-6.12-fix_sysvipc_kabi_1_2_3.patch
+001.GKI-below-6.12-fix_sysvipc_kabi_3_4_5.patch
+```
