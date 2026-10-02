@@ -1088,8 +1088,13 @@ struct task_struct {
 	struct nameidata		*nameidata;
 
 #ifdef CONFIG_SYSVIPC
-	// struct sysv_sem			sysvsem;
-	// struct sysv_shm			sysvshm;
+	/*
+	 * Droidspaces GKI kABI fix:
+	 * keep task_struct layout unchanged. sysvsem/sysvshm are stored in
+	 * ANDROID_KABI reserves below.
+	 */
+	/* struct sysv_sem sysvsem; */
+	/* struct sysv_shm sysvshm; */
 #endif
 #ifdef CONFIG_DETECT_HUNG_TASK
 	/* hung task detection */
@@ -1481,6 +1486,7 @@ struct task_struct {
 	ANDROID_KABI_RESERVE(5);
 
 #ifdef CONFIG_SYSVIPC
+	/* Droidspaces GKI kABI fix: use free ABI padding for SYSVIPC. */
 	ANDROID_KABI_USE(6, struct sysv_sem sysvsem);
 	_ANDROID_KABI_REPLACE(ANDROID_KABI_RESERVE(7); ANDROID_KABI_RESERVE(8), struct sysv_shm sysvshm);
 #else

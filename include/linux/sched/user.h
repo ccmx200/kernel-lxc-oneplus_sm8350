@@ -22,8 +22,12 @@ struct user_struct {
 	atomic_long_t epoll_watches; /* The number of file descriptors currently watched */
 #endif
 #ifdef CONFIG_POSIX_MQUEUE
-	/* protected by mq_lock	*/
-	//unsigned long mq_bytes;	/* How many bytes can be allocated to mqueue? */
+	/*
+	 * Droidspaces GKI kABI fix:
+	 * keep user_struct layout unchanged. mq_bytes is stored in the
+	 * ANDROID_KABI reserve below.
+	 */
+	/* unsigned long mq_bytes; */
 #endif
 	unsigned long locked_shm; /* How many pages of mlocked shm ? */
 	unsigned long unix_inflight;	/* How many files in flight in unix sockets */
@@ -42,6 +46,7 @@ struct user_struct {
 	struct ratelimit_state ratelimit;
 
 #if defined(CONFIG_POSIX_MQUEUE)
+	/* Droidspaces GKI kABI fix: use free ABI padding for POSIX_MQUEUE. */
 	ANDROID_KABI_USE(1, unsigned long mq_bytes);
 	ANDROID_KABI_RESERVE(2);
 #else
